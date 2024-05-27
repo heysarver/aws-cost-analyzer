@@ -1,0 +1,49 @@
+<!-- /templates/pages/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Cost Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold">AWS Cost Analysis</h1>
+        <div class="mt-4">
+            <label for="org_id" class="block text-sm font-medium text-gray-700">Organization ID</label>
+            <input type="text" id="org_id" name="org_id" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        </div>
+        <div class="mt-4 flex space-x-4">
+            <button id="summary-btn" class="px-4 py-2 bg-blue-500 text-white rounded">View Summary</button>
+            <button id="by-service-btn" class="px-4 py-2 bg-green-500 text-white rounded">View By Service</button>
+        </div>
+        <div id="results" class="mt-8">
+            <!-- Results will be injected here -->
+        </div>
+    </div>
+    <script>
+        document.getElementById('summary-btn').addEventListener('click', function() {
+            const org_id = document.getElementById('org_id').value;
+            axios.get(`/api/costs/${org_id}/summary`)
+                .then(response => {
+                    document.getElementById('results').innerHTML = JSON.stringify(response.data, null, 2);
+                }).catch(error => {
+                    document.getElementById('results').innerHTML = '<p class="text-red-500">Error: ' + error.response.data.error + '</p>';
+                });
+        });
+
+        document.getElementById('by-service-btn').addEventListener('click', function() {
+            const org_id = document.getElementById('org_id').value;
+            axios.get(`/api/costs/${org_id}/by-service`)
+                .then(response => {
+                    document.getElementById('results').innerHTML = JSON.stringify(response.data, null, 2);
+                }).catch(error => {
+                    document.getElementById('results').innerHTML = '<p class="text-red-500">Error: ' + error.response.data.error + '</p>';
+                });
+        });
+    </script>
+</body>
+</html>
