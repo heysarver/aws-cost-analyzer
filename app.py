@@ -8,6 +8,8 @@ from api import api_bp
 load_dotenv()
 
 app = Flask(__name__)
+app.config.from_mapping(load_config())
+
 app.register_blueprint(api_bp, url_prefix='/api')
 
 @app.route('/')

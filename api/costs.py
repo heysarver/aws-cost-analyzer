@@ -1,7 +1,8 @@
 # /api/costs.py
 
 import boto3
-from flask import request, jsonify, current_app
+import datetime
+from flask import jsonify, current_app
 from . import api_bp
 
 def sanitize_input(value):
@@ -13,13 +14,20 @@ def sanitize_input(value):
 def get_cost_summary(org_id):
     input_org_id = sanitize_input(org_id)
     client = boto3.client('ce', 
-                          aws_access_key_id=current_app.config['AWS_ACCESS_KEY_ID'], 
-                          aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'])
+                          aws_access_key_id=current_app.config.get('AWS_ACCESS_KEY_ID'), 
+                          aws_secret_access_key=current_app.config.get('AWS_SECRET_ACCESS_KEY'))
+    
+    # Calculate date range for the last 3 months
+    end_date = datetime.datetime.today().replace(day=1)
+    start_date = (end_date - datetime.timedelta(days=1)).replace(day=1) - datetime.timedelta(days=60)
+    end_date = end_date.strftime('%Y-%m-%d')
+    start_date = start_date.strftime('%Y-%m-%d')
+    
     try:
         response = client.get_cost_and_usage(
             TimePeriod={
-                'Start': '2023-01-01', # Example period
-                'End': '2023-01-31'
+                'Start': start_date,
+                'End': end_date
             },
             Granularity='MONTHLY',
             Metrics=['UnblendedCost'],
@@ -38,13 +46,20 @@ def get_cost_summary(org_id):
 def get_cost_by_service(org_id):
     input_org_id = sanitize_input(org_id)
     client = boto3.client('ce', 
-                          aws_access_key_id=current_app.config['AWS_ACCESS_KEY_ID'], 
-                          aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'])
+                          aws_access_key_id=current_app.config.get('AWS_ACCESS_KEY_ID'), 
+                          aws_secret_access_key=current_app.config.get('AWS_SECRET_ACCESS_KEY'))
+    
+    # Calculate date range for the last 3 months
+    end_date = datetime.datetime.today().replace(day=1)
+    start_date = (end_date - datetime.timedelta(days=1)).replace(day=1) - datetime.timedelta(days=60)
+    end_date = end_date.strftime('%Y-%m-%d')
+    start_date = start_date.strftime('%Y-%m-%d')
+    
     try:
         response = client.get_cost_and_usage(
             TimePeriod={
-                'Start': '2023-01-01',
-                'End': '2023-01-31'
+                'Start': start_date,
+                'End': end_date
             },
             Granularity='MONTHLY',
             Metrics=['UnblendedCost'],

@@ -29,7 +29,7 @@
             const org_id = document.getElementById('org_id').value;
             axios.get(`/api/costs/${org_id}/summary`)
                 .then(response => {
-                    document.getElementById('results').innerHTML = JSON.stringify(response.data, null, 2);
+                    document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(response.data, null, 2) + '</pre>';
                 }).catch(error => {
                     document.getElementById('results').innerHTML = '<p class="text-red-500">Error: ' + error.response.data.error + '</p>';
                 });
@@ -39,7 +39,7 @@
             const org_id = document.getElementById('org_id').value;
             axios.get(`/api/costs/${org_id}/by-service`)
                 .then(response => {
-                    document.getElementById('results').innerHTML = JSON.stringify(response.data, null, 2);
+                    document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(response.data, null, 2) + '</pre>';
                 }).catch(error => {
                     document.getElementById('results').innerHTML = '<p class="text-red-500">Error: ' + error.response.data.error + '</p>';
                 });
