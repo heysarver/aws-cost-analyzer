@@ -28,7 +28,7 @@ function createBillingChart(billingData) {
         });
     });
 
-    new Chart(ctx, {
+    return new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,

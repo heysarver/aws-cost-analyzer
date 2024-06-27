@@ -19,7 +19,7 @@ def get_linked_accounts():
         session = get_aws_session()
         org_client = session.client('organizations')
         
-        accounts = []
+        accounts = [{'id': 'all', 'name': 'All Accounts (Combined)'}]  # Add the "All Accounts" option
         paginator = org_client.get_paginator('list_accounts')
         for page in paginator.paginate():
             for account in page['Accounts']:
@@ -32,6 +32,10 @@ def get_linked_accounts():
     except ClientError as e:
         print(f"An error occurred while fetching linked accounts: {e}")
         return []
+
+# /app/aws_utils.py
+
+# ... (previous code remains the same)
 
 def get_billing_data(account_id):
     try:
@@ -53,17 +57,17 @@ def get_billing_data(account_id):
             'Metrics': ['BlendedCost'],
             'GroupBy': [
                 {'Type': 'DIMENSION', 'Key': 'SERVICE'},
-                {'Type': 'DIMENSION', 'Key': 'LINKED_ACCOUNT'}
             ]
         }
 
-        if org_id and account_id:
+        if org_id and account_id and account_id != 'all':
             request['Filter'] = {
                 'Dimensions': {
                     'Key': 'LINKED_ACCOUNT',
                     'Values': [account_id]
                 }
             }
+            request['GroupBy'].append({'Type': 'DIMENSION', 'Key': 'LINKED_ACCOUNT'})
 
         response = client.get_cost_and_usage(**request)
         
