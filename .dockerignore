@@ -1,4 +1,4 @@
-# /.gitignore
+# /.dockerignore
 __pycache__
 *.pyc
 .env
