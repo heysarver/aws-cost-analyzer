@@ -1,0 +1,57 @@
+<!-- /app/templates/index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-4">AWS Billing Report Generator</h1>
+<div class="mb-4">
+    <label class="block text-gray-700 text-sm font-bold mb-2" for="account_id">
+        Select Account
+    </label>
+    <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="account_id" name="account_id">
+        <option value="">Select an account</option>
+        {% for account in linked_accounts %}
+            <option value="{{ account.id }}" {% if account.id == selected_account %}selected{% endif %}>
+                {{ account.name }} {% if account.id != 'all' %}({{ account.id }}){% endif %}
+            </option>
+        {% endfor %}
+    </select>
+</div>
+<div id="chart-container" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" style="display: none;">
+    <canvas id="billingChart"></canvas>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+let chart;
+
+document.getElementById('account_id').addEventListener('change', function() {
+    const accountId = this.value;
+    if (accountId) {
+        fetchBillingData(accountId);
+    } else {
+        document.getElementById('chart-container').style.display = 'none';
+    }
+});
+
+function fetchBillingData(accountId) {
+    fetch(`/api/billing_data?account_id=${accountId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('chart-container').style.display = 'block';
+            if (chart) {
+                chart.destroy();
+            }
+            chart = createBillingChart(data);
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+{% if billing_data %}
+document.getElementById('chart-container').style.display = 'block';
+chart = createBillingChart({{ billing_data|tojson }});
+{% endif %}
+</script>
+{% endblock %}
