@@ -1,21 +1,15 @@
 # /app.py
-import os
-from flask import Flask, render_template
 from dotenv import load_dotenv
-from config import load_config
-from api import api_bp
+import os
+from app import create_app
 
 load_dotenv()
 
-app = Flask(__name__)
-app.config.from_mapping(load_config())
-
-app.register_blueprint(api_bp, url_prefix='/api')
-
-@app.route('/')
-def index():
-    return render_template('pages/index.html')
+app = create_app()
 
 if __name__ == '__main__':
-    config = load_config()
-    app.run(host=config['FLASK_HOST'], port=config['FLASK_PORT'], debug=config['FLASK_DEBUG'])
+    app.run(
+        host=os.getenv('FLASK_HOST', '0.0.0.0'),
+        port=int(os.getenv('FLASK_PORT', 5000)),
+        debug=os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    )

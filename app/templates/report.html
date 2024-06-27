@@ -1,0 +1,31 @@
+<!-- /app/templates/report.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-4">AWS Billing Report</h1>
+<form method="POST" action="/" class="mb-4">
+    <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="org_id">
+            Select Account
+        </label>
+        <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="org_id" name="org_id" onchange="this.form.submit()">
+            {% for account in linked_accounts %}
+                <option value="{{ account.id }}" {% if account.id == selected_account %}selected{% endif %}>
+                    {{ account.name }} ({{ account.id }})
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+</form>
+<div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <canvas id="billingChart"></canvas>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+    const billingData = {{ billing_data|tojson }};
+    createBillingChart(billingData);
+</script>
+{% endblock %}
